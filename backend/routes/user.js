@@ -1,7 +1,8 @@
+// routes/user.js
+
 import express from 'express';
-import { myProfile, register, verifyUser, loginUser } from '../controllers/user.js';
+import { register, verifyUser, loginUser, myProfile } from '../controllers/user.js';
 import { isAuth } from '../middleware/isAuth.js';
-import TryCatch from "../middleware/TryCatch.js";
 
 const router = express.Router();
 
@@ -15,6 +16,6 @@ router.post('/verify', verifyUser);
 router.post('/login', loginUser);
 
 // Fetching profile route with isAuth middleware
-router.get('/profile', isAuth, TryCatch(myProfile));
+router.get('/profile', isAuth, myProfile);
 
 export default router;
