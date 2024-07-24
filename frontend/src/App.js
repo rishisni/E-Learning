@@ -16,6 +16,7 @@ import CreateCourse from './pages/courses/CreateCourse.js';
 import AddLecture from './pages/lectures/addlecture.js';
 import LectureDetail from './pages/lectures/lecturedetail.js';
 import StatsPage from './pages/stats/statspage.js';
+import MyCourses from './pages/mycourses/Mycourse.js';
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/add-lecture/:courseId" element={<AddLecture />} />
             <Route path="/lecture/:lectureId" element={<LectureDetail />} /> 
             <Route path='/stats' element={<StatsPage />} />
+            <Route path='/my-courses' element={<MyCourses />} />
           </Routes>
         </CourseProvider>
       </UserContextProvider>

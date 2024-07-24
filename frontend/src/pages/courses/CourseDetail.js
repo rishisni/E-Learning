@@ -18,16 +18,22 @@ import {
 
 const CourseDetail = () => {
   const { courseId } = useParams();
-  const { selectedCourse, fetchCourseById, lectures, fetchLecturesByCourseId, deleteLecture } = useCourseContext();
+  const { selectedCourse, fetchCourseById, lectures, fetchLecturesByCourseId, deleteLecture, enrollInCourse } = useCourseContext();
   const { user } = UserData();
   const [loading, setLoading] = useState(true);
+  const [isEnrolled, setIsEnrolled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         await fetchCourseById(courseId);
+
+        // Fetch lectures and check enrollment status
         await fetchLecturesByCourseId(courseId);
+        if (user) {
+          setIsEnrolled(user.subscription.includes(courseId));
+        }
       } catch (error) {
         console.error('Failed to fetch course details or lectures:', error);
       } finally {
@@ -35,7 +41,17 @@ const CourseDetail = () => {
       }
     };
     fetchData();
-  }, [courseId, fetchCourseById, fetchLecturesByCourseId]);
+  }, [courseId, fetchCourseById, fetchLecturesByCourseId, user]);
+
+  const handleEnrollClick = async () => {
+    try {
+      await enrollInCourse(courseId);
+      setIsEnrolled(true); // Update state after successful enrollment
+      navigate('/my-courses'); // Redirect to "My Courses" page
+    } catch (err) {
+      console.error('Failed to enroll in course:', err);
+    }
+  };
 
   if (loading) {
     return (
@@ -68,10 +84,6 @@ const CourseDetail = () => {
     }
   };
 
-  const handleEnrollClick = async () => {
-    // Implement the enroll function if needed
-  };
-
   return (
     <MDBContainer className='py-5'>
       {selectedCourse && (
@@ -90,19 +102,19 @@ const CourseDetail = () => {
               {selectedCourse.price && (
                 <div>
                   <MDBIcon fas icon="rupee-sign" className='me-2'/>
-                  <strong>Price: </strong>Rs{selectedCourse.price}
+                  <strong> : </strong>{selectedCourse.price}.
                 </div>
               )}
               {selectedCourse.duration && (
                 <div>
                   <MDBIcon fas icon="clock" className='me-2'/>
-                  <strong>Duration: </strong>{convertDuration(selectedCourse.duration)}
+                  {convertDuration(selectedCourse.duration)}
                 </div>
               )}
               {selectedCourse.createdBy && (
                 <div>
                   <MDBIcon fas icon="user" className='me-2'/>
-                  <strong>By: </strong>{selectedCourse.createdBy}
+                  {selectedCourse.createdBy}
                 </div>
               )}
             </MDBCardText>
@@ -112,51 +124,92 @@ const CourseDetail = () => {
                   <MDBIcon fas icon="plus" className='me-2'/> Add Lecture
                 </MDBBtn>
               )}
-              {!user && (
+              {!user ? (
                 <MDBBtn color="success" onClick={handleEnrollClick} className="ms-3">
-                  <MDBIcon fas icon="sign-in-alt" className='me-2'/> Enroll Now
+                  <MDBIcon fas icon="sign-in-alt" className='me-2'/> Enroll Now For Free
                 </MDBBtn>
-              )}
+              ) : null}
             </div>
           </MDBCardBody>
         </MDBCard>
       )}
-      <MDBRow>
-        {lectures.length > 0 ? (
-          lectures.map(lecture => (
-            <MDBCol key={lecture._id} md='4' className='mb-4'>
-              <MDBCard className='h-100 shadow-3'>
-                <MDBCardBody>
-                  <MDBCardTitle>{lecture.title}</MDBCardTitle>
-                  <MDBCardText>{lecture.description}</MDBCardText>
-                  <MDBCardText>
-                    <MDBIcon fas icon="clock" className='me-2'/>
-                    <strong>Duration: </strong>{convertDuration(lecture.duration)}
-                  </MDBCardText>
-                  <div className="d-flex justify-content-between">
-                    <MDBBtn color='secondary' onClick={() => navigate(`/lecture/${lecture._id}`)}>
-                      <MDBIcon fas icon="info-circle" className='me-2'/> View Details
-                    </MDBBtn>
-                    {user && user.role === 'admin' ? (
-                      <MDBBtn color='danger' onClick={() => handleDeleteLecture(lecture._id)}>
-                        <MDBIcon fas icon="trash" className='me-2'/> Delete Lecture
+
+      {user && user.role === 'admin' ? (
+        <MDBRow>
+          {lectures.length > 0 ? (
+            lectures.map(lecture => (
+              <MDBCol key={lecture._id} md='4' className='mb-4'>
+                <MDBCard className='h-100 shadow-3'>
+                  <MDBCardBody>
+                    <MDBCardTitle>{lecture.title}</MDBCardTitle>
+                    <MDBCardText>{lecture.description}</MDBCardText>
+                    <MDBCardText>
+                      <MDBIcon fas icon="clock" className='me-2' />
+                      {convertDuration(lecture.duration)}
+                    </MDBCardText>
+                    <div className="d-flex justify-content-between">
+                      <MDBBtn color='secondary' onClick={() => navigate(`/lecture/${lecture._id}`)}>
+                        <MDBIcon fas icon="info-circle" className='me-2' /> View Details
                       </MDBBtn>
-                    ) : (
+                      {user.role === 'admin' ? (
+                        <MDBBtn color='danger' onClick={() => handleDeleteLecture(lecture._id)}>
+                          <MDBIcon fas icon="trash" className='me-2' /> Delete Lecture
+                        </MDBBtn>
+                      ) : (
+                        <MDBBtn color='info' onClick={() => window.open(lecture.video, '_blank')}>
+                          <MDBIcon fas icon="play" className='me-2' /> Watch Lecture
+                        </MDBBtn>
+                      )}
+                    </div>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            ))
+          ) : (
+            <MDBContainer className='py-5 text-center'>
+              <p className='h5'>No lectures available for this course.</p>
+            </MDBContainer>
+          )}
+        </MDBRow>
+      ) : isEnrolled ? (
+        <MDBRow>
+          {lectures.length > 0 ? (
+            lectures.map(lecture => (
+              <MDBCol key={lecture._id} md='4' className='mb-4'>
+                <MDBCard className='h-100 shadow-3'>
+                  <MDBCardBody>
+                    <MDBCardTitle>{lecture.title}</MDBCardTitle>
+                    <MDBCardText>{lecture.description}</MDBCardText>
+                    <MDBCardText>
+                      <MDBIcon fas icon="clock" className='me-2' />
+                      {convertDuration(lecture.duration)}
+                    </MDBCardText>
+                    <div className="d-flex justify-content-between">
+                      <MDBBtn color='secondary' onClick={() => navigate(`/lecture/${lecture._id}`)}>
+                        <MDBIcon fas icon="info-circle" className='me-2' /> View Details
+                      </MDBBtn>
                       <MDBBtn color='info' onClick={() => window.open(lecture.video, '_blank')}>
-                        <MDBIcon fas icon="play" className='me-2'/> Watch Lecture
+                        <MDBIcon fas icon="play" className='me-2' /> Watch Lecture
                       </MDBBtn>
-                    )}
-                  </div>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          ))
-        ) : (
-          <MDBContainer className='py-5 text-center'>
-            <p className='h5'>No lectures available for this course.</p>
-          </MDBContainer>
-        )}
-      </MDBRow>
+                    </div>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            ))
+          ) : (
+            <MDBContainer className='py-5 text-center'>
+              <p className='h5'>No lectures available for this course.</p>
+            </MDBContainer>
+          )}
+        </MDBRow>
+      ) : (
+        <MDBContainer className='py-5 text-center'>
+          <p className='h5'>You need to enroll in this course to view the lectures.</p>
+          <MDBBtn color="success" onClick={handleEnrollClick} className="ms-3">
+            <MDBIcon fas icon="sign-in-alt" className='me-2' /> Enroll Now For Free
+          </MDBBtn>
+        </MDBContainer>
+      )}
     </MDBContainer>
   );
 };

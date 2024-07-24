@@ -19,10 +19,10 @@ const schema = new mongoose.Schema(
         type : String ,
         default : "user" ,
     },
-    subscription: {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "Courses"
-    }
+    subscription: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Courses"
+      }],
     
 
 },

@@ -105,6 +105,16 @@ export const CourseProvider = ({ children }) => {
     }
   }, []);
 
+  const enrollInCourse = useCallback(async (courseId) => {
+    try {
+      await axios.post(`/api/checkout/${courseId}`);
+      // Optionally, fetch updated user courses
+      fetchMyCourses();
+    } catch (error) {
+      console.error('Failed to enroll in course:', error);
+    }
+  }, [fetchMyCourses]);
+
   useEffect(() => {
     fetchAllCourses();
   }, [fetchAllCourses]);
@@ -126,7 +136,7 @@ export const CourseProvider = ({ children }) => {
         createCourse,
         addLecture,
         deleteCourse,
-        deleteLecture
+        deleteLecture,enrollInCourse
       }}
     >
       {children}
