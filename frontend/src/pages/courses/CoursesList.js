@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useCourseContext } from '../../context/CourseContext.js';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { UserData } from '../../context/UserContext.js'; // Import UserData context
 import { server } from '../../index.js';
 
 import {
@@ -18,7 +19,8 @@ import {
 } from 'mdb-react-ui-kit';
 
 const CoursesList = () => {
-  const { courses, fetchAllCourses } = useCourseContext();
+  const { courses, fetchAllCourses, deleteCourse } = useCourseContext();
+  const { user } = UserData(); // Get user data from UserData context
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,14 +45,20 @@ const CoursesList = () => {
                     <strong>Price: </strong>Rs.{course.price}
                   </MDBCardText>
                 )}
-                <MDBCardText>{course.description}</MDBCardText>
-                
-
-                <MDBBtn color="secondary" onClick={() => {
-                    navigate(`/course/${course._id}`);
-                  }} className="ms-3">
-                    <MDBIcon icon="compass" className="me-2" /> Explore
+                {course.createdBy && (
+                  <MDBCardText>
+                    <strong>By: </strong>{course.createdBy}
+                  </MDBCardText>
+                )}
+                <MDBBtn color="secondary" onClick={() => navigate(`/course/${course._id}`)} className="ms-3">
+                  <MDBIcon icon="compass" className="me-2" /> Explore
+                </MDBBtn>
+                {/* Conditionally render delete button based on user role */}
+                {user && user.role === 'admin' && (
+                  <MDBBtn color="danger" onClick={() => deleteCourse(course._id)} className="ms-3">
+                    <MDBIcon icon="trash" className="me-2" /> Delete
                   </MDBBtn>
+                )}
               </MDBCardBody>
             </MDBCard>
           </MDBCol>

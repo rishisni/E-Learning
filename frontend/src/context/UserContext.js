@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "../api/api.js";
 
@@ -18,11 +18,7 @@ export const UserContextProvider = ({ children }) => {
   async function loginUser(email, password, navigate, fetchMyCourse) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post('/api/login', {
-        email,
-        password,
-      });
-  
+      const { data } = await axios.post('/api/login', { email, password });
       toast.success(data.message);
       localStorage.setItem("token", data.token); // Store token in localStorage
       axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`; // Set default header for Authorization
@@ -41,18 +37,12 @@ export const UserContextProvider = ({ children }) => {
       }
     }
   }
-  
 
   // Function to register user
   async function registerUser(name, email, password, navigate) {
     setBtnLoading(true);
     try {
-      const { data } = await axios.post('/api/register', {
-        name,
-        email,
-        password,
-      });
-
+      const { data } = await axios.post('/api/register', { name, email, password });
       toast.success(data.message);
       localStorage.setItem("activationToken", data.activationToken);
       setBtnLoading(false);
@@ -72,11 +62,7 @@ export const UserContextProvider = ({ children }) => {
     setBtnLoading(true);
     const activationToken = localStorage.getItem("activationToken");
     try {
-      const { data } = await axios.post('/api/verify', {
-        otp,
-        activationToken,
-      });
-
+      const { data } = await axios.post('/api/verify', { otp, activationToken });
       toast.success(data.message);
       navigate("/login");
       localStorage.clear();
@@ -91,9 +77,8 @@ export const UserContextProvider = ({ children }) => {
     }
   }
 
-  
   // Function to fetch user profile
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
@@ -106,8 +91,9 @@ export const UserContextProvider = ({ children }) => {
       }
     }
     setLoading(false);
-  };
+  }, []);
 
+  // Function to logout user
   const logout = () => {
     localStorage.removeItem("token"); // Remove token from localStorage
     axios.defaults.headers.common['Authorization'] = null; // Remove Authorization header
@@ -117,13 +103,12 @@ export const UserContextProvider = ({ children }) => {
 
   // Fetch user on mount
   useEffect(() => {
-    fetchUser(); // Fetch user data again when the profile page is rendered
+    fetchUser(); // Fetch user data when the component mounts
   }, [fetchUser]);
-  
-  
+
   return (
     <UserContext.Provider
-    value={{
+      value={{
         user,
         setUser,
         setIsAuth,
@@ -131,8 +116,8 @@ export const UserContextProvider = ({ children }) => {
         loginUser,
         registerUser,
         verifyOtp,
-        logout, // Include logout function in the context value
-        fetchUser,
+        logout,
+        fetchUser, // Include fetchUser in the context value
         btnLoading,
         loading,
       }}

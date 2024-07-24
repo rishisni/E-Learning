@@ -1,5 +1,3 @@
-// components/CreateCourse.js
-
 import React, { useState } from 'react';
 import { useCourseContext } from '../../context/CourseContext.js';
 import {
@@ -23,14 +21,14 @@ const CreateCourse = () => {
     duration: '',
     price: '',
   });
-  const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null); // Changed from image to file
 
   const handleChange = (e) => {
     setCourseData({ ...courseData, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]); // Changed from handleImageChange to handleFileChange
   };
 
   const handleSubmit = async (e) => {
@@ -42,7 +40,7 @@ const CreateCourse = () => {
     formData.append('createdBy', courseData.createdBy);
     formData.append('duration', courseData.duration);
     formData.append('price', courseData.price);
-    formData.append('image', image);
+    formData.append('file', file); // Changed from 'image' to 'file'
 
     createCourse(formData);
   };
@@ -99,8 +97,8 @@ const CreateCourse = () => {
                 />
                 <MDBInput
                   type='file'
-                  name='image'
-                  onChange={handleImageChange}
+                  name='file' // Changed from 'image' to 'file'
+                  onChange={handleFileChange}
                   className='mb-3'
                 />
                 <MDBBtn type='submit' color='primary'>

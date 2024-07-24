@@ -27,33 +27,39 @@ export const createCourse = TryCatch(async (req, res) => {
     })
 }
 );
-
 export const addLectures = TryCatch(async (req, res) => {
-
+    // Find the course
     const course = await Courses.findById(req.params.id);
-    if(!course)
-        return res.status(404).json({
-            message :"No Course Found with this id !"
-        })
-
-    const {title, description, createdAt,duration} = req.body 
-
-    const video = req.file ;
-
+    if (!course) {
+      return res.status(404).json({
+        message: "No Course Found with this id!",
+      });
+    }
+  
+    // Extract fields from request body
+    const { title, description, duration, videoUrl } = req.body;
+  
+    // Validate videoUrl (it could be a URL or some specific validation logic)
+    if (!videoUrl) {
+      return res.status(400).json({
+        message: "YouTube URL is required",
+      });
+    }
+  
+    // Create the lecture with the URL instead of a file path
     const lecture = await Lecture.create({
-        title,
-        description,
-        duration,
-        course : course._id,
-        createdAt,
-        video : video?.path,
+      title,
+      description,
+      duration,
+      course: course._id,
+      video: videoUrl, // Store the YouTube URL
     });
+  
     res.status(201).json({
-        message :"Lecture Added  Succesfully"
-    })
-}
-);
-
+      message: "Lecture Added Successfully",
+    });
+  });
+  
 
 export const deleteLecture = TryCatch(async (req,res) => {
     const lecture =  await Lecture.findById(req.params.id)

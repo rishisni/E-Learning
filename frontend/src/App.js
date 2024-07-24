@@ -1,5 +1,3 @@
-// App.js
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -15,12 +13,15 @@ import AboutPage from './pages/about/AboutPage.js';
 import CourseDetail from './pages/courses/CourseDetail.js';
 import CoursesList from './pages/courses/CoursesList.js';
 import CreateCourse from './pages/courses/CreateCourse.js';
+import AddLecture from './pages/lectures/addlecture.js';
+import LectureDetail from './pages/lectures/lecturedetail.js';
+import StatsPage from './pages/stats/statspage.js';
 
 const App = () => {
   return (
-    <CourseProvider>
+    <Router>
       <UserContextProvider>
-        <Router>
+        <CourseProvider>
           <Navbar />
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -32,10 +33,13 @@ const App = () => {
             <Route path='/all-courses' element={<CoursesList />} />
             <Route path='/course/:courseId' element={<CourseDetail />} />
             <Route path='/create-course' element={<CreateCourse />} />
+            <Route path="/add-lecture/:courseId" element={<AddLecture />} />
+            <Route path="/lecture/:lectureId" element={<LectureDetail />} /> 
+            <Route path='/stats' element={<StatsPage />} />
           </Routes>
-        </Router>
+        </CourseProvider>
       </UserContextProvider>
-    </CourseProvider>
+    </Router>
   );
 };
 
