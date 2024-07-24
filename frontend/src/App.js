@@ -17,10 +17,13 @@ import AddLecture from './pages/lectures/addlecture.js';
 import LectureDetail from './pages/lectures/lecturedetail.js';
 import StatsPage from './pages/stats/statspage.js';
 import MyCourses from './pages/mycourses/Mycourse.js';
+import Footer from './pages/footer/Footer.js';
 
 const App = () => {
   return (
     <Router>
+       <div className="d-flex flex-column min-vh-100">
+       <div className="flex-grow-1">
       <UserContextProvider>
         <CourseProvider>
           <Navbar />
@@ -41,6 +44,9 @@ const App = () => {
           </Routes>
         </CourseProvider>
       </UserContextProvider>
+      </div>
+      <Footer/>
+      </div>
     </Router>
   );
 };

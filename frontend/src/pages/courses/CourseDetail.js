@@ -99,12 +99,13 @@ const CourseDetail = () => {
             <MDBCardTitle className='h3'>{selectedCourse.title}</MDBCardTitle>
             <MDBCardText className='text-muted'>{selectedCourse.description}</MDBCardText>
             <MDBCardText>
-              {selectedCourse.price && (
-                <div>
-                  <MDBIcon fas icon="rupee-sign" className='me-2'/>
-                  <strong> : </strong>{selectedCourse.price}.
-                </div>
-              )}
+             
+               {selectedCourse.price && (
+                  <MDBCardText>
+                    <MDBIcon fas icon="rupee-sign" className='me-2'/>
+                    <s> <strong> : </strong>{selectedCourse.price}.</s> Enroll now to get it for free
+                  </MDBCardText>
+                )}
               {selectedCourse.duration && (
                 <div>
                   <MDBIcon fas icon="clock" className='me-2'/>

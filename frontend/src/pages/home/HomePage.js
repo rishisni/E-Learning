@@ -12,6 +12,7 @@ import {
   MDBRow,
   MDBCol,
   MDBCardImage,
+  MDBIcon
 } from 'mdb-react-ui-kit';
 import { CSSTransition } from 'react-transition-group';
 import './HomePage.css';
@@ -60,10 +61,15 @@ const HomePage = () => {
                 )}
                 <MDBCardBody>
                   <MDBCardTitle>{course.title}</MDBCardTitle>
-                  <MDBCardText>Rs.{course.price}</MDBCardText>
+                  {course.price && (
+                  <MDBCardText>
+                    <strong>Price: </strong>
+                    <s>Rs.{course.price}</s> Enroll now to get it for free
+                  </MDBCardText>
+                )}
                   <div className="d-flex justify-content-center">
                     <Link to={`/course/${course._id}`}>
-                      <MDBBtn color="primary">Learn More</MDBBtn>
+                      <MDBBtn color="secondary"><MDBIcon icon="compass" className="me-2" /> Explore</MDBBtn>
                     </Link>
                   </div>
                 </MDBCardBody>

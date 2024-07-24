@@ -46,6 +46,11 @@ const MyCourses = () => {
   const handleCardClick = (courseId) => {
     navigate(`/course/${courseId}`);
   };
+  const convertDuration = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  };
 
   return (
     <MDBContainer className='py-5'>
@@ -77,7 +82,7 @@ const MyCourses = () => {
                   </MDBCardText>
                   <MDBCardText>
                     <MDBIcon fas icon="clock" className='me-2'/>
-                    {course.duration}
+                    {convertDuration(course.duration)}
                   </MDBCardText>
                 </MDBCardBody>
               </MDBCard>
